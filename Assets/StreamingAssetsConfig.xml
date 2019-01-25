@@ -1,0 +1,5 @@
+<轨道教学>
+  <软件信息 公司="HX" 姓名="oukasi" 版本号="1.0.0" 密钥="891114" />
+  <ModleClickandRotates RotateSpeed="10" ScaleSpeed="10" ScaleLimitMin="0.5" ScaleLimitMax="10" />
+  <TCPServer IP="192.168.1.4" Port="5566" ConnectionRequestCount="10" ResultLength="1024" />
+</轨道教学>
