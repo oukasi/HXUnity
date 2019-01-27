@@ -19,6 +19,8 @@ public class TCPServer : MonoBehaviour
     private byte[] ReceiveData;
     int ReceiveNumber=0;
     string ReceiveStr;
+    string ResultStr=null;
+    IPEndPoint TcpClientPoint;
 
     // Start is called before the first frame update
     void Start()
@@ -41,31 +43,45 @@ public class TCPServer : MonoBehaviour
         while(IsOn){
             try{
                 ClientSocket=ServerSocket.Accept();
-                Thread ReceiveThread=new Thread(SocketReceive);
-                ReceiveThread.Start(ClientSocket);
             }catch{
                 break;
             }
+            TcpClientPoint=(IPEndPoint)ClientSocket.RemoteEndPoint;
+            SocketData.TCPClientDic.Add(TcpClientPoint.Address,ClientSocket);
+            Debug.Log("Link Client IP is："+TcpClientPoint.Address+":"+TcpClientPoint.Port.ToString());
+            Thread ReceiveThread=new Thread(SocketReceive);
+            ReceiveThread.Start(ClientSocket);
         }
     }
     private void SocketReceive(object _clientSocket){
         Socket ClientSocket=_clientSocket as Socket;
-        Debug.Log("开始接受数据");
         while(true){
             ReceiveData=new byte[1024];
             try{
                 ReceiveNumber=ClientSocket.Receive(ReceiveData);
                 if (ReceiveNumber>0)
                 {
-                    String temp=Encoding.ASCII.GetString(ReceiveData);
-                    Debug.Log("服务器接收数据长度："+ReceiveNumber);
-                    Debug.Log("服务器接收"+temp);
-                    ClientSocket.Send(ReceiveData);
+                    byte[] CopyReceiveData=new byte[ReceiveNumber];
+                    Array.Copy(ReceiveData,0,CopyReceiveData,0,CopyReceiveData.Length);
+                    if(SocketData.TcpClientMessageCheck(CopyReceiveData,out ResultStr)){
+                        Debug.Log("服务器接受的数据为："+ResultStr);
+                        SocketData.TcpClientMessageQuene.Enqueue(ResultStr);
+                        SocketSend(ClientSocket,CopyReceiveData);
+                    }else{
+                        Debug.Log(ResultStr);
+                    }
                 }      
             }catch{
 
             }
         }
+    }
+    public void SocketSend(Socket _clientSocket,String _head,string _body ){
+        byte[] SendData=Encoding.ASCII.GetBytes(SocketData.TcpClientMessageSend(_head,_body));
+        _clientSocket.Send(SendData);
+    }
+    public void SocketSend(Socket _clientSocket,Byte[] _message){
+        _clientSocket.Send(_message);
     }
     void Update()
     {

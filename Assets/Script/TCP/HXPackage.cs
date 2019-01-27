@@ -11,6 +11,7 @@ public class HXPackage : IPackage
     }
     public void Pack(IByteArray _source,Action<byte[]>_packHandler)
     {
+        var _length=_source.Length;
         _packHandler(_source.Read(_source.Length));
     }
 }

@@ -18,6 +18,7 @@ public class TCPClient : MonoBehaviour
     private bool _IsConnected;
     private Socket ClinetSocket;
     private int _Counter;
+    private string ResultStr;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,21 +40,15 @@ public class TCPClient : MonoBehaviour
         _IsConnected = true;
     }
     void OnReceive(byte[] bytes){
-        String temp=Encoding.ASCII.GetString(bytes);
-        Debug.Log("客户端接收的数据长度为："+bytes.Length);
-        Debug.Log("客户端接收的数据为："+temp);
+        if(SocketData.TcpClientMessageCheck(bytes,out ResultStr)){
+            Debug.Log("客户端接受的数据为："+ResultStr);
+        }else{
+            Debug.Log(ResultStr);
+        }
     }
-    public void SocketSend(){
-        Debug.Log("客户端发送数据");
-        byte[] SendData=new byte[1024];
-        SendData=Encoding.ASCII.GetBytes("ABCD");
-        Debug.Log("客户端发送数据长度为："+SendData.Length);
+    public void SocketSend(string _head,string _body){
+        byte[] SendData=Encoding.ASCII.GetBytes(SocketData.TcpClientMessageSend(_head,_body));
         _Tcp.Send(SendData);
     }
     
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

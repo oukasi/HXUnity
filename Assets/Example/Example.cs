@@ -60,7 +60,7 @@ public class Example : MonoBehaviour
     void OnReceive(byte[] bytes)
     {
         var data = BitConverter.ToInt32(bytes, 0);
-       //Debug.Log("receive: " + data);
+        Debug.Log("receive: " + data);
     }
 
     void OnApplicationQuit()
